@@ -41,6 +41,24 @@ Chaque contrôle s'affiche en `[OK]` (vert) ou `[ECHEC]` (rouge), puis un bilan 
 | **Temps** | Service de temps démarré |
 | | Fuseau horaire Paris |
 
+## Contrôles manuels réalisés sur le lab
+
+| Domaine et contrôleur (PDC) | Unités d'organisation |
+| --- | --- |
+| ![Get-ADDomain](../screenshots/05-01-get-addomain.png) | ![Get-ADOrganizationalUnit](../screenshots/05-02-get-adorganizationalunit.png) |
+
+| Comptes (`krbtgt` et Invité désactivés) | Membres de `GG-Employes` |
+| --- | --- |
+| ![Get-ADUser](../screenshots/05-03-get-aduser.png) | ![Get-ADGroupMember](../screenshots/05-04-get-adgroupmember.png) |
+
+| Enregistrements A de la zone `labo.local` | Réservation DHCP de PC-01 |
+| --- | --- |
+| ![Enregistrements A](../screenshots/05-05-dns-enregistrements-a.png) | ![Réservation](../screenshots/05-06-dhcp-reservation.png) |
+
+GPO liée à `Ordinateurs-LABO` :
+
+![Get-GPInheritance](../screenshots/05-07-get-gpinheritance.png)
+
 ## Réutilisation
 
 Les paramètres (domaine, zone, étendue, adresses, OU, GPO, groupe) sont regroupés en tête du script : il suffit de les adapter pour vérifier un autre environnement. Le script peut aussi servir de **contrôle de non-régression** après chaque panne provoquée ([04 – Tests de résilience](04-tests-resilience.md)).
