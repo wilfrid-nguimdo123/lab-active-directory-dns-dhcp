@@ -9,8 +9,6 @@
 
 | | |
 | --- | --- |
-| **Auteur** | Wilfrid Nidol NGUIMDO, Master 2 Management de la Cybersécurité et du Cloud (IPSSI Montpellier) |
-| **Période** | 19 → 21 octobre 2026 |
 | **Type** | Projet personnel, laboratoire virtualisé (VirtualBox) |
 | **Contact** | [LinkedIn](https://www.linkedin.com/in/wilfrid-nguimdo-780283336) |
 
@@ -25,8 +23,6 @@ Au-delà du déploiement, il couvre **l'exploitation** :
 - **9 incidents réels** rencontrés pendant la construction, chacun diagnostiqué et documenté ;
 - **4 pannes provoquées volontairement** (DNS, DHCP, horloge/Kerberos, enregistrement DNS), avec diagnostic méthodique, preuves Wireshark et résolution ;
 - une **vérification complète en PowerShell** de l'état final (21 contrôles).
-
-Ce laboratoire sert de base au projet suivant : **détection d'attaques Active Directory avec Splunk (SOC)**.
 
 ## Résultats clés
 
@@ -48,7 +44,7 @@ Ce laboratoire sert de base au projet suivant : **détection d'attaques Active D
  │ 192.168.10.10 (IP fixe)           │◄────────────►│ 192.168.10.150 (réservation DHCP) │
  │ AD DS · DNS · DHCP · source NTP   │              │ membre du domaine labo.local      │
  └───────────────────────────────────┘              └───────────────────────────────────┘
-          192.168.10.1 : passerelle réservée à un futur pare-feu (pfSense / OPNsense)
+          192.168.10.1 : passerelle réservée au pare-feu (convention d'adressage)
 ```
 
 Détails et justification des choix : [docs/01-architecture.md](docs/01-architecture.md)
@@ -86,11 +82,6 @@ Détails et justification des choix : [docs/01-architecture.md](docs/01-architec
 ```
 ├── README.md
 ├── docs/            # documentation technique (6 documents)
-├── screenshots/     # 52 captures d'écran, préfixées par le numéro du document qui les utilise
+├── screenshots/     # 53 captures d'écran, préfixées par le numéro du document qui les utilise
 └── scripts/         # scripts PowerShell de déploiement et de vérification
 ```
-
-## Suite du projet
-
-1. **SOC avec Splunk** : collecte des journaux du DC et du poste (Universal Forwarder et Sysmon), simulation d'attaques dans le laboratoire isolé, règles de détection (4625, 4728, 4740, 4771, 7036…) cartographiées sur MITRE ATT&CK.
-2. **Pare-feu pfSense/OPNsense** en `192.168.10.1` : accès Internet filtré et segmentation du laboratoire.
