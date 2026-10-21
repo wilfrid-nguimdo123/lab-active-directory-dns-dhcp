@@ -15,7 +15,10 @@ Reproduire le socle d'identité et de réseau d'une PME sous Windows. On le dép
 | Serveur | **SRV-DC01** : Windows Server 2022 Standard (expérience de bureau). Rôles : AD DS, DNS, DHCP, source de temps |
 | Client | **PC-01** : Windows 11 Entreprise, membre du domaine |
 | Domaine | `labo.local` (NetBIOS `LABO`), nouvelle forêt |
-| Suite prévue | Projet SOC « Détection d'attaques AD avec Splunk », puis pare-feu pfSense en `.1` |
+
+Les deux machines virtuelles tournent sous VirtualBox. Un **instantané** (« Reservation ok ») a été pris sur PC-01 une fois la configuration validée, avant les tests de panne : il permet de revenir à un état sain à tout moment.
+
+![Machines virtuelles et instantané dans VirtualBox](../screenshots/01-01-virtualbox-vms-instantane.png)
 
 ```
            Réseau interne « labnet » : 192.168.10.0/24 (sans Internet)
@@ -24,7 +27,7 @@ Reproduire le socle d'identité et de réseau d'une PME sous Windows. On le dép
  │ 192.168.10.10 (IP fixe)      │          │ 192.168.10.150 (réservation) │
  │ AD DS · DNS · DHCP · NTP     │          │ membre de labo.local         │
  └──────────────────────────────┘          └──────────────────────────────┘
-        192.168.10.1 = passerelle réservée au futur pare-feu
+        192.168.10.1 = passerelle réservée au pare-feu
 ```
 
 ## Plan d'adressage : 192.168.10.0/24
@@ -32,7 +35,7 @@ Reproduire le socle d'identité et de réseau d'une PME sous Windows. On le dép
 | Plage | Usage | Pourquoi |
 | --- | --- | --- |
 | `.0` / `.255` | Réseau / broadcast | Non attribuables |
-| `.1` | Passerelle | Réservée au futur pare-feu (convention entreprise) |
+| `.1` | Passerelle | Réservée au pare-feu (convention entreprise) |
 | `.10` – `.49` | Serveurs, IP fixes | Adresses stables pour l'infrastructure |
 | `.50` – `.99` | Équipements (imprimantes…) | Réserve pour des réservations |
 | `.100` – `.109` | Exclues du DHCP | Marge pour des équipements configurés à la main |
