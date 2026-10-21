@@ -53,12 +53,22 @@ Ce laboratoire sert de base au projet suivant : **détection d'attaques Active D
 
 Détails et justification des choix : [docs/01-architecture.md](docs/01-architecture.md)
 
+## Aperçu
+
+| Bannière légale déployée par GPO sur PC-01 | Échange DHCP (DORA) mesuré dans Wireshark |
+| --- | --- |
+| ![Bannière de connexion](screenshots/02-16-pc01-banniere-connexion.png) | ![DORA en 6 ms](screenshots/03-11-wireshark-dora-6ms.png) |
+
+| Panne 2 : Discover sans réponse, service DHCP arrêté | Panne 3 : décalage d'horloge de -17 012 s mesuré |
+| --- | --- |
+| ![Discover sans Offer](screenshots/04-p2-02-wireshark-discover-sans-offer.png) | ![Écart d'horloge](screenshots/04-p3-04-w32tm-ecart-17012s.png) |
+
 ## Documentation
 
 | Document | Contenu |
 | --- | --- |
 | [01 – Architecture et choix techniques](docs/01-architecture.md) | Plan d'adressage, organisation AD, DNS, DHCP, GPO, choix justifiés |
-| [02 – Procédure de déploiement](docs/02-procedure-deploiement.md) | Étapes de mise en œuvre et scripts associés |
+| [02 – Procédure de déploiement](docs/02-procedure-deploiement.md) | Étapes de mise en œuvre, avec captures et scripts associés |
 | [03 – Registre des incidents](docs/03-registre-incidents.md) | 9 incidents réels : symptôme, cause racine, correction |
 | [04 – Tests de résilience](docs/04-tests-resilience.md) | 4 pannes provoquées, analysées et réparées, avec preuves Wireshark |
 | [05 – Vérification PowerShell](docs/05-verification-powershell.md) | Contrôle de l'état final, script réutilisable |
@@ -76,6 +86,7 @@ Détails et justification des choix : [docs/01-architecture.md](docs/01-architec
 ```
 ├── README.md
 ├── docs/            # documentation technique (6 documents)
+├── screenshots/     # 52 captures d'écran, préfixées par le numéro du document qui les utilise
 └── scripts/         # scripts PowerShell de déploiement et de vérification
 ```
 
