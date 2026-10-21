@@ -16,6 +16,18 @@ Script : [`1-Install-DC.ps1`](../scripts/1-Install-DC.ps1) — en deux temps, le
 4. Installation des rôles AD DS, DNS et DHCP.
 5. Promotion en contrôleur de domaine d'une nouvelle forêt `labo.local` (NetBIOS `LABO`).
 
+| Serveur préparé : nom `SRV-DC01`, IP fixe `192.168.10.10` | Rôles installés |
+| --- | --- |
+| ![Serveur local](../screenshots/02-01-srv-dc01-serveur-local.png) | ![Rôles installés](../screenshots/02-02-roles-installes.png) |
+
+| Assistant AD DS : nouvelle forêt `labo.local` | Vérification de la configuration requise |
+| --- | --- |
+| ![Nouvelle forêt](../screenshots/02-03-adds-nouvelle-foret.png) | ![Prérequis](../screenshots/02-04-adds-verification-prerequis.png) |
+
+> L'avertissement sur la délégation DNS est normal pour une nouvelle forêt dont la zone parente (`local`) n'existe pas.
+
+![Serveur promu : rôles AD DS et DNS opérationnels](../screenshots/02-05-dc-promu-ad-ds-dns.png)
+
 ## Étape 2 – DNS, DHCP et temps (SRV-DC01)
 
 Script : [`2-Config-Reseau.ps1`](../scripts/2-Config-Reseau.ps1)
@@ -27,6 +39,18 @@ Script : [`2-Config-Reseau.ps1`](../scripts/2-Config-Reseau.ps1)
 5. Réservation de PC-01 en `.150`.
 6. Le DC devient la source de temps fiable du domaine (`w32tm /config /reliable:yes`).
 
+| Assistant de zone inverse | Zone `10.168.192.in-addr.arpa` créée |
+| --- | --- |
+| ![Assistant zone inverse](../screenshots/02-06-dns-assistant-zone-inverse.png) | ![Zone inverse](../screenshots/02-07-dns-zone-inverse.png) |
+
+Vérification : l'enregistrement SRV `_ldap._tcp.dc._msdcs.labo.local` pointe bien vers `srv-dc01.labo.local` sur le port 389.
+
+![Vérification SRV](../screenshots/02-08-dns-verification-srv.png)
+
+Preuve Wireshark : l'offre DHCP transporte bien les options 003 (routeur `192.168.10.1`), 006 (DNS `192.168.10.10`) et 015 (domaine `labo.local`).
+
+![Offre DHCP et ses options](../screenshots/02-15-wireshark-dhcp-offer-options.png)
+
 ## Étape 3 – Annuaire et GPO (SRV-DC01)
 
 Script : [`3-Config-AD-GPO.ps1`](../scripts/3-Config-AD-GPO.ps1)
@@ -36,6 +60,10 @@ Script : [`3-Config-AD-GPO.ps1`](../scripts/3-Config-AD-GPO.ps1)
 3. Comptes `alice.martin`, `bob.durand`, `wilfrid.admin`.
 4. Groupe `GG-Employes` (Alice + Bob), `wilfrid.admin` dans *Admins du domaine*.
 5. GPO `GPO-Banniere-Connexion` liée à `Ordinateurs-LABO`.
+
+| Utilisateurs dans `Utilisateurs-LABO` | `wilfrid.admin` membre de *Admins du domaine* | Groupe `GG-Employes` |
+| --- | --- | --- |
+| ![Utilisateurs](../screenshots/02-09-ad-utilisateurs.png) | ![Groupes de wilfrid.admin](../screenshots/02-10-ad-wilfrid-admin-groupes.png) | ![GG-Employes](../screenshots/02-11-ad-groupe-gg-employes.png) |
 
 > Écrite en PowerShell, la GPO pose les deux mêmes valeurs de registre que l'option de sécurité configurée à la souris et produit le même effet sur PC-01. La différence : dans la console, elles apparaissent sous « Paramètres de registre supplémentaires » au lieu de « Options de sécurité ».
 
@@ -47,6 +75,14 @@ Script : [`4-Join-PC01.ps1`](../scripts/4-Join-PC01.ps1) — PC-01 doit avoir re
 2. Jonction au domaine `labo.local` directement dans `Ordinateurs-LABO`, redémarrage.
 3. Connexion en `LABO\alice.martin` : `whoami` → `labo\alice.martin`.
 4. En invite administrateur : `gpupdate /force`, puis `gpresult /r /scope computer` → `GPO-Banniere-Connexion` appliquée.
+
+| PC-01 rangé dans `Ordinateurs-LABO` | Ouverture de session en compte du domaine |
+| --- | --- |
+| ![PC-01 dans Ordinateurs-LABO](../screenshots/02-12-ad-pc01-ordinateurs-labo.png) | ![Écran de connexion](../screenshots/02-13-pc01-ecran-connexion-alice.png) |
+
+| `whoami` → `labo\alice.martin` | Bannière légale affichée avant l'ouverture de session |
+| --- | --- |
+| ![whoami](../screenshots/02-14-pc01-whoami-alice.png) | ![Bannière](../screenshots/02-16-pc01-banniere-connexion.png) |
 
 ## Étape 5 – Vérification
 
