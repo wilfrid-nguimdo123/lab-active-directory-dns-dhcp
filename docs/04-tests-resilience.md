@@ -36,6 +36,16 @@
 | **Correction** | DNS repassé en automatique, `ipconfig /flushdns`, puis `nltest /dsgetdc:labo.local /force` → `\\SRV-DC01.labo.local` |
 | **Leçon** | En Active Directory, quand rien ne marche, regardez d'abord le DNS. |
 
+**Preuves Wireshark**
+
+| Avant : requêtes DNS normales vers `192.168.10.10` | Pendant : aucune requête DNS, seulement des ARP vers `.1` |
+| --- | --- |
+| ![DNS normal](../screenshots/04-p1-01-wireshark-dns-normal.png) | ![ARP passerelle](../screenshots/04-p1-02-wireshark-arp-passerelle.png) |
+
+Après correction : le poste réinscrit sa fiche (*Dynamic update*), puis retrouve le contrôleur de domaine (requête SRV `_ldap._tcp`, puis A `srv-dc01`).
+
+![DNS rétabli](../screenshots/04-p1-03-wireshark-dns-retabli.png)
+
 ## Panne 2 : service DHCP arrêté
 
 | | |
@@ -46,6 +56,18 @@
 | **Correction** | `net start dhcpserver`, puis `ipconfig /renew` sur PC-01 : **DORA complet en 6 ms**, retour en `.150` avec la passerelle `.1` |
 | **Trace SOC** | Événement **7036** (service arrêté), journal Système |
 | **Leçon** | Une panne DHCP est différée : elle n'apparaît qu'au démarrage ou au renouvellement des postes. |
+
+**Preuves**
+
+| Service arrêté puis redémarré sur SRV-DC01 | PC-01 en APIPA `169.254.221.9` |
+| --- | --- |
+| ![net stop / start](../screenshots/04-p2-03-net-stop-start-dhcpserver.png) | ![APIPA](../screenshots/04-p2-01-ipconfig-apipa.png) |
+
+| Discover répétés, aucune Offer | Service relancé : Offer, Request, ACK |
+| --- | --- |
+| ![Discover sans Offer](../screenshots/04-p2-02-wireshark-discover-sans-offer.png) | ![DORA rétabli](../screenshots/04-p2-04-wireshark-dora-retabli.png) |
+
+![Retour en 192.168.10.150 avec la passerelle](../screenshots/04-p2-05-ipconfig-renew-150.png)
 
 ## Panne 3 : décalage d'horloge et Kerberos
 
@@ -58,6 +80,20 @@
 | **Trace SOC** | Événement **4771**, code `0x25` (décalage d'horloge), journal Sécurité du DC |
 | **Leçon** | Le blocage arrive au renouvellement des tickets, d'où les appels du type « hier ça marchait, ce matin plus rien ». Ce test a aussi révélé que l'horloge du serveur était fausse, corrigée avec `tzutil`, `Set-Date` et `w32tm /config /reliable:yes`. |
 
+**Preuves**
+
+| Panne provoquée, `gpupdate` réussit malgré tout | Purge des tickets (utilisateur et compte machine) |
+| --- | --- |
+| ![Arrêt w32time](../screenshots/04-p3-01-stop-w32time-gpupdate-ok.png) | ![klist purge](../screenshots/04-p3-02-klist-purge.png) |
+
+Le TGT obtenu à 19:21:40, avant la panne, reste valide jusqu'à 5:21:40 : la session continue sur les tickets en mémoire.
+
+![TGT en cache](../screenshots/04-p3-03-klist-tgt-en-cache.png)
+
+| Mesure : écart de -17 012 s | Correction : écart ramené à -0,0001 s |
+| --- | --- |
+| ![Écart mesuré](../screenshots/04-p3-04-w32tm-ecart-17012s.png) | ![Resynchronisation](../screenshots/04-p3-05-w32tm-resync-corrige.png) |
+
 ## Panne 4 : enregistrement DNS supprimé
 
 | | |
@@ -68,3 +104,13 @@
 | **Correction** | `ipconfig /registerdns` lancé **sur PC-01** : la fiche revient grâce à la mise à jour dynamique sécurisée |
 | **Trace SOC** | Événement **516** (enregistrement supprimé), journal DNS Server / Audit |
 | **Leçon** | Chaque machine gère sa propre fiche DNS : au démarrage, au renouvellement DHCP, puis toutes les 24 h. |
+
+**Preuves**
+
+Sur le serveur : après `ipconfig /flushdns`, `pc-01.labo.local` n'existe plus. Le `ipconfig /registerdns` lancé sur le serveur ne change rien (le piège).
+
+![Non-existent domain](../screenshots/04-p4-01-nslookup-non-existent.png)
+
+| `ipconfig /registerdns` lancé sur PC-01 | La fiche est revenue : `192.168.10.150` |
+| --- | --- |
+| ![registerdns sur PC-01](../screenshots/04-p4-02-pc01-registerdns.png) | ![Fiche rétablie](../screenshots/04-p4-03-nslookup-retabli.png) |
